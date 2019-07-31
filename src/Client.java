@@ -1,13 +1,11 @@
-
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
-
 /**
-* This class implements java socket client
-* @author pankaj
-*
+ *  Nicholas Soultanian
+ *  Client.java
+ *  Cs 3800
+ *  Professor Young
+ *  Client side of my server Project
 */
 public class Client  {
     private final static String b1 = "C:\\Users\\Nicholas\\Desktop\\1B.txt";
@@ -17,7 +15,7 @@ public class Client  {
     private final static String b400000 = "C:\\Users\\Nicholas\\Desktop\\400000B.txt";
     private final static String b2000000= "C:\\Users\\Nicholas\\Desktop\\2000000B.txt";
 
-    private final static double rTT1B = 1;
+    private final static double rTT1B = .001069363;
 
     private final static double b1Size = 1;
     private final static double b500Size = 500;
@@ -28,45 +26,44 @@ public class Client  {
 
     public static void main(String[] args){
     try{
-        BufferedReader br = new BufferedReader(new FileReader(b1));
-        String temp;
+        BufferedReader bufferedRead = new BufferedReader(new FileReader(b2000000));
+        String placeHolder;
         StringBuilder file = new StringBuilder();
-        while(( temp = br.readLine()) != null){
-            file.append(temp);
+        while(( placeHolder = bufferedRead.readLine()) != null){
+            file.append(placeHolder);
         }
 
         Socket server = new Socket("localhost", 5420);//connect to ServerSocket
-        OutputStream os = server.getOutputStream();
+        OutputStream outputStream = server.getOutputStream();
 
-        os.write(file.toString().getBytes());
+
+        outputStream.write(file.toString().getBytes());
         double start = System.nanoTime();
-        os.flush();
 
-        PrintWriter pw = new PrintWriter(new FileWriter("Output1.txt"));
-        InputStream is = server.getInputStream();
+        PrintWriter printWriter = new PrintWriter(new FileWriter("Output1.txt"));
+        InputStream inputStream = server.getInputStream();
         byte[] b = new byte[file.toString().length()];
+
         double end =System.nanoTime();
-        is.read(b);
+        double read = inputStream.read(b);
+
 
         double rTT = end-start;
+        rTT = rTT * Math.pow(10,-9);
         System.out.println("Here is Round Trip Time: " + rTT);
 
-        double throughPut = b1Size / rTT;
+        double throughPut = b2000000Size / rTT;
         System.out.println("Here is ThroughPut: " + throughPut);
 
-        double effectiveBandwidth = (b1Size/(rTT-rTT1B));
-        System.out.println("Here is the Effective Bandwidth for a" + b1Size + "B file: ");
-
-
-        for(byte a : b )
-            pw.print(Character.toChars(a));
-
-        os.close();
-        is.close();  //close everything
+        double effectiveBandwidth = ((b2000000Size * 8)/(rTT-rTT1B));
+        System.out.println("Here is the Effective Bandwidth for a " + b2000000Size + "B file: " +effectiveBandwidth);
+        outputStream.flush();
+        outputStream.close();
+        inputStream.close();  //close everything
         server.close();
 
     }catch(Exception e){
-        System.out.println("RIP");
+        System.out.println("RIP" + e);
         System.exit(0);
     }
 }
